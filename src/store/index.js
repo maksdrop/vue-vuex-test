@@ -10,21 +10,12 @@ export default createStore({
     searchUser: "",
     isError: false,
   },
-  getters: {
-    searchedUser(state) {
-      if (state.searchUser.length == 0) {
-        return;
-      }
-      let search = state.searchUser.split(/[^a-z]+/i).filter(Boolean);
-      return state.users.filter((user) => search.includes(user.username));
-    },
-  },
+  getters: {},
   mutations: {
     setUsers(state, users) {
       state.users = users;
     },
     setUserId(state, userId) {
-      console.log(userId);
       state.userId = userId;
     },
     setUser(state, user) {
@@ -41,21 +32,37 @@ export default createStore({
     },
   },
   actions: {
-    async fetchUsers({ commit }) {
+    async fetchUsers({state, commit }, data) {
       try {
-        const response = await axios.get("https://jsonplaceholder.typicode.com/users");
+        commit("setSearchUser", data.value);
+        if (data.value.length == 0) {
+          return;
+        }
+        
+        let search = data.value.split(/[^a-z0-9~!@#$%^&*()_|+\-=?;:'".<>]+/i).filter(Boolean).join('&username=')
+        let url = `https://jsonplaceholder.typicode.com/users?username=${search}`;
+        const response = await axios.get(url);
         commit("setUsers", response.data);
+
+        if (data.userId) {
+          let result = state.users.filter((user) => user.id == data.userId);
+
+          if (result.length == 0) {
+            commit("setUserId", "");
+            commit("setUser", null);
+          }
+        }
       } catch (e) {
         console.log(e);
         commit("setError", true);
       }
     },
-    async fetchUser({ state, commit }) {
+    selectUser({ state, commit }, userId) {
       try {
         commit("setPreloader", true);
-        const response = await axios.get(
-          `https://jsonplaceholder.typicode.com/users/${state.userId}`);
-        commit("setUser", response.data);
+        commit("setUserId", userId);
+        let result = state.users.filter((user) => user.id == userId);
+        commit("setUser", result);
       } catch (e) {
         console.log(e);
       } finally {

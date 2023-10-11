@@ -12,6 +12,7 @@ export default {
 .loader {
   position: absolute;
   top: 180px;
+  left: 50%;
   font-size: 10px;
   width: 1.1em;
   height: 1.1em;

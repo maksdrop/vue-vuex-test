@@ -3,20 +3,19 @@
     <h3 class="sidebar__title">
       Поиск сотрудников
     </h3>
-    <MyInput
+    <input
       class="sidebar__search"
-      :model-value="searchUser"
-      @update:model-value="setSearchUser"
+      @input="updateInput" 
       type="text"
       placeholder="Введите Id или имя"
     />
     <span class="sidebar__subtitle">
       Результаты
     </span>
-    <div v-if="searchedUser?.length > 0">
+    <div v-if="users?.length > 0">
       <div
         :class="[userId == user.id ? 'sidebar__users_border' : '', 'sidebar__users']"
-        v-for="user in searchedUser"
+        v-for="user in users"
         :key="user.id"
         @click="btnClick(user.id)"
       >
@@ -46,43 +45,38 @@
 </template>
 
 <script>
-import MyInput from "@/components/UI/MyInput";
-import {mapState, mapActions, mapGetters, mapMutations} from 'vuex';
+import {mapState, mapActions, mapMutations} from 'vuex';
 
 export default {
-  components: {
-    MyInput,
-  },
   name: "MainSidebar",
 
   methods: {
     ...mapMutations({
-      setSearchUser: 'setSearchUser',
       setUserId: 'setUserId'
     }),
     ...mapActions({
       fetchUsers: 'fetchUsers',
-      fetchUser: 'fetchUser'
+      selectUser: 'selectUser',
     }),
     btnClick(id) {
       if (this.userId != id) {
-        this.setUserId(id)
-        this.fetchUser()
+        this.selectUser(id)
       }
-      
+    },
+    updateInput(event) {
+      let data = {
+        userId: this.userId,
+        value: event.target.value
+      }
+      this.fetchUsers(data)
     }
-  },
-  mounted() {
-    this.fetchUsers();
   },
   computed: {
     ...mapState({
+      users: state => state.users,
       searchUser: state => state.searchUser,
       userId: state => state.userId,
       isError: state => state.isError,
-    }),
-    ...mapGetters({
-      searchedUser: 'searchedUser'
     }),
   },
 };
@@ -116,12 +110,13 @@ export default {
   }
 
   &__search {
-    margin: 22px 0;
-    padding: 16px;
-    font-size: 14px;
-    color: #76787d;
-    border: 2px solid  #E9ECEF;
-    border-radius: 8px;
+  width: 240px;
+  margin: 22px 0;
+  padding: 16px;
+  font-size: 14px;
+  color: #76787d;
+  border: 2px solid  #E9ECEF;
+  border-radius: 8px;
   }
 
   &__subtitle {

@@ -1,8 +1,18 @@
 <template>
-  <div :class="[user == null || isPreloader ? 'card__empty' : '', 'card']">
+  <div 
+    @click="btn" 
+    :class="[user == undefined && !isPreloader 
+      ? 
+      'card__empty' 
+      : 
+      '', 
+      'card']"
+    >
     <MyPreloader v-if="isPreloader" />
     <div 
-      v-else-if="user" 
+      v-for="user1 in user"
+      :key="user1.id"
+      v-else-if="user"
       class="card__container"
     >
       <img 
@@ -10,14 +20,14 @@
         src="../assets/img/user.png" 
       />
       <div>
-        <p class="card__username card__text_bold">{{ user.name }}</p>
+        <p class="card__username card__text_bold">{{ user1.name }}</p>
         <p class="card__text card__text_bold">
           email:
-          <span class="card__text_light">{{ user.email }}</span>
+          <span class="card__text_light">{{ user1.email }}</span>
         </p>
         <p class="card__text card__text_bold">
           phone:
-          <span class="card__text_light">{{ user.phone }}</span>
+          <span class="card__text_light">{{ user1.phone }}</span>
         </p>
         <p class="card__about card__text_bold">О себе</p>
         <p class="card__text card__text_light">
@@ -41,8 +51,8 @@ export default {
 
   computed: {
     ...mapState({
-      user: state => state.user,
       isPreloader: state => state.isPreloader,
+      user: state => state.user,
     }),
   }
 };
