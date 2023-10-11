@@ -26,6 +26,7 @@
         </div>
       </div>
     </div>
+    <MyPreloader v-else-if="isPreloaderUsers" style="top: 200px; width: 0.5em; height: 0.5em;" />
     <div 
       v-else-if="isError && searchUser.length > 0" 
       class="sidebar__users_error"
@@ -45,9 +46,13 @@
 </template>
 
 <script>
+import MyPreloader from "@/components/UI/Preloader";
 import {mapState, mapActions, mapMutations} from 'vuex';
 
 export default {
+  components: {
+    MyPreloader
+  },
   name: "MainSidebar",
 
   methods: {
@@ -73,6 +78,7 @@ export default {
   },
   computed: {
     ...mapState({
+      isPreloaderUsers: state => state.isPreloaderUsers,
       users: state => state.users,
       searchUser: state => state.searchUser,
       userId: state => state.userId,

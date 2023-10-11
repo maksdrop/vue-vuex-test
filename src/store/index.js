@@ -7,6 +7,7 @@ export default createStore({
     userId: "",
     user: null,
     isPreloader: false,
+    isPreloaderUsers: false,
     searchUser: "",
     isError: false,
   },
@@ -24,6 +25,9 @@ export default createStore({
     setPreloader(state, bool) {
       state.isPreloader = bool;
     },
+    setPreloaderUsers(state, bool) {
+      state.isPreloaderUsers = bool;
+    },
     setError(state, bool) {
       state.isError = bool;
     },
@@ -34,6 +38,7 @@ export default createStore({
   actions: {
     async fetchUsers({state, commit }, data) {
       try {
+        commit("setPreloaderUsers", true);
         commit("setSearchUser", data.value);
         if (data.value.length == 0) {
           return;
@@ -41,7 +46,9 @@ export default createStore({
         
         let search = data.value.split(/[^a-z0-9~!@#$%^&*()_|+\-=?;:'".<>]+/i).filter(Boolean).join('&username=')
         let url = `https://jsonplaceholder.typicode.com/users?username=${search}`;
+        console.log(url)
         const response = await axios.get(url);
+        console.log(response.data)
         commit("setUsers", response.data);
 
         if (data.userId) {
@@ -53,21 +60,19 @@ export default createStore({
           }
         }
       } catch (e) {
-        console.log(e);
+        console.log("error", e);
         commit("setError", true);
+      } finally {
+        setTimeout(() => commit("setPreloaderUsers", false), 200);
       }
     },
     selectUser({ state, commit }, userId) {
-      try {
         commit("setPreloader", true);
         commit("setUserId", userId);
         let result = state.users.filter((user) => user.id == userId);
         commit("setUser", result);
-      } catch (e) {
-        console.log(e);
-      } finally {
         setTimeout(() => commit("setPreloader", false), 200);
-      }
+      
     },
   },
 });
