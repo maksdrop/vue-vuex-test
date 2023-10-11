@@ -46,9 +46,7 @@ export default createStore({
         
         let search = data.value.split(/[^a-z0-9~!@#$%^&*()_|+\-=?;:'".<>]+/i).filter(Boolean).join('&username=')
         let url = `https://jsonplaceholder.typicode.com/users?username=${search}`;
-        console.log(url)
         const response = await axios.get(url);
-        console.log(response.data)
         commit("setUsers", response.data);
 
         if (data.userId) {
